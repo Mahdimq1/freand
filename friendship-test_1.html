@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>تست رفاقت</title>
+<style>
+  :root { --bg:#fff4d6; --ink:#2b1d0e; --yes:#1f9d55; --no:#d64545; --card:#ffffff; }
+  @media (prefers-color-scheme: dark) {
+    :root { --bg:#1d1a14; --ink:#f5ecd9; --card:#2a261d; }
+  }
+  * { box-sizing:border-box; }
+  html, body { height:100%; margin:0; }
+  body {
+    background:var(--bg); color:var(--ink);
+    font-family: Tahoma, "Vazirmatn", system-ui, sans-serif;
+    display:flex; align-items:center; justify-content:center;
+    overflow:hidden; padding:16px;
+  }
+  .card {
+    background:var(--card); border-radius:20px; padding:32px 24px;
+    max-width:440px; width:100%; text-align:center;
+    box-shadow:0 8px 30px rgba(0,0,0,.15);
+  }
+  h1 { font-size:1.5rem; line-height:1.6; margin:0 0 8px; }
+  p { margin:0 0 24px; opacity:.8; min-height:1.6em; }
+  .row { display:flex; gap:12px; justify-content:center; }
+  button {
+    -webkit-tap-highlight-color:transparent; touch-action:manipulation;
+    font:inherit; font-size:1.1rem; padding:12px 28px; border:0;
+    border-radius:12px; color:#fff; cursor:pointer;
+  }
+  #yes { background:var(--yes); }
+  #no  { background:var(--no); transition:transform .15s; }
+  #no.free { position:fixed; z-index:10; touch-action:none; }
+  #yes:focus-visible, #no:focus-visible { outline:3px solid var(--ink); outline-offset:3px; }
+  .big { font-size:3rem; margin-bottom:8px; }
+  @media (prefers-reduced-motion: reduce) { #no { transition:none; } }
+</style>
+</head>
+<body>
+<div class="card" id="card">
+  <h1 id="q">آیا <span id="who">من</span> بهترین رفیق دنیا هستم؟</h1>
+  <p id="msg">فقط یه جواب صادقانه لطفاً.</p>
+  <div class="row">
+    <button id="yes">آره</button>
+    <button id="no">نه</button>
+  </div>
+</div>
+
+<script>
+  // اینجا اسم خودت رو بنویس:
+  const MY_NAME = "من";
+
+  document.getElementById("who").textContent = MY_NAME;
+  const yes = document.getElementById("yes");
+  const no  = document.getElementById("no");
+  const msg = document.getElementById("msg");
+  const card = document.getElementById("card");
+
+  const lines = [
+    "مطمئنی؟",
+    "یه بار دیگه فکر کن.",
+    "این دکمه امروز حالش خوب نیست.",
+    "دکمه نه فرار کرد، خودت هم فرار نکن!",
+    "اینقدر تلاش نکن، نمی‌گیریش 😄",
+    "من که میگم آره رو بزن.",
+    "دکمه نه رفت مرخصی.",
+    "لج نکن دیگه!"
+  ];
+  let tries = 0;
+
+  function runAway() {
+    tries++;
+    no.classList.add("free");
+    const pad = 12;
+    const maxX = window.innerWidth  - no.offsetWidth  - pad;
+    const maxY = window.innerHeight - no.offsetHeight - pad;
+    no.style.left = Math.max(pad, Math.random() * maxX) + "px";
+    no.style.top  = Math.max(pad, Math.random() * maxY) + "px";
+    msg.textContent = lines[(tries - 1) % lines.length];
+    if (tries > 5) no.style.transform = "scale(" + Math.max(0.4, 1 - tries * 0.05) + ")";
+  }
+
+  // چند رویداد مختلف برای اینکه روی هر گوشی و مرورگری کار کنه
+  function handler(e) { e.preventDefault(); e.stopPropagation(); runAway(); }
+  ["pointerdown", "pointerenter", "mouseover", "touchstart", "mousedown", "click"].forEach(ev =>
+    no.addEventListener(ev, handler, { passive:false })
+  );
+
+  yes.addEventListener("click", () => {
+    no.remove();
+    card.innerHTML =
+      '<div class="big">🏆</div>' +
+      '<h1>می‌دونستم!</h1>' +
+      '<p>تو بعد از ' + tries + ' بار تلاش برای زدن «نه» به این نتیجه رسیدی. حالا یه چایی بهم بدهکاری ☕</p>';
+  });
+</script>
+</body>
+</html>
